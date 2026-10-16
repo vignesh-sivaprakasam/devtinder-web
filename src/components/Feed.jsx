@@ -26,6 +26,12 @@ export const Feed = () => {
   }, []);
 
   console.log("feed :", feed);
+  if (!feed) {
+    return;
+  }
+  if (feed.length === 0) {
+    return <h1 className="flex justify-center">No new users found!</h1>;
+  }
   return (
     <div className="flex justify-center">
       {feed && <UserCard user={feed[0]} />}
