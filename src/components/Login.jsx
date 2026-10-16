@@ -6,8 +6,13 @@ import { useNavigate } from "react-router-dom";
 import { BASE_URL } from "../utils/constants";
 
 export const Login = () => {
-  const [emailId, setEmailId] = useState("rohit.sharma@gmail.com");
-  const [password, setPassword] = useState("Password@123");
+  const [emailId, setEmailId] = useState("");
+  const [password, setPassword] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+
+  const [isLoginForm, setIsLoginForm] = useState(true);
+
   const [error, setError] = useState("");
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -33,12 +38,60 @@ export const Login = () => {
     }
   };
 
+  const handleSignup = async () => {
+    try {
+      const res = await axios.post(
+        BASE_URL + "/signup",
+        {
+          firstName,
+          lastName,
+          emailId,
+          password,
+        },
+        {
+          withCredentials: true,
+        },
+      );
+
+      console.log("res.data", res.data);
+      dispatch(userActions.addUser(res.data.data));
+      navigate("/profile");
+    } catch (err) {
+      console.log("Error : ", err);
+      setError(err?.response?.data?.message || "");
+    }
+  };
+
   return (
     <div className="flex justify-center my-10">
       <div className="card bg-base-300 w-96 shadow-sm">
         <div className="card-body">
-          <h2 className="card-title justify-center">Login</h2>
+          <h2 className="card-title justify-center">
+            {isLoginForm ? "Login" : "Sign Up"}
+          </h2>
           <div>
+            {!isLoginForm && (
+              <>
+                <fieldset className="fieldset">
+                  <legend className="fieldset-legend">First name</legend>
+                  <input
+                    type="text"
+                    className="input"
+                    value={firstName}
+                    onChange={(ev) => setFirstName(ev.target.value)}
+                  />
+                </fieldset>
+                <fieldset className="fieldset">
+                  <legend className="fieldset-legend">Last name</legend>
+                  <input
+                    type="text"
+                    className="input"
+                    value={lastName}
+                    onChange={(ev) => setLastName(ev.target.value)}
+                  />
+                </fieldset>
+              </>
+            )}
             <fieldset className="fieldset">
               <legend className="fieldset-legend">Email ID</legend>
               <input
@@ -60,10 +113,20 @@ export const Login = () => {
           </div>
           <p className="text-red-500">{error}</p>
           <div className="card-actions justify-center my-4">
-            <button className="btn btn-primary" onClick={handleLogin}>
-              Login
+            <button
+              className="btn btn-primary"
+              onClick={isLoginForm ? handleLogin : handleSignup}
+            >
+              {isLoginForm ? "Login" : "Sign up"}
             </button>
           </div>
+          <a
+            href="#"
+            className="mx-auto"
+            onClick={() => setIsLoginForm(!isLoginForm)}
+          >
+            {isLoginForm ? "New user signup here" : "Existing user login here"}
+          </a>
         </div>
       </div>
     </div>
